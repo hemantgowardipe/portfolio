@@ -17,11 +17,11 @@ const Work = () => {
     },
     {
       id: 2,
-      title: "IBM Cloud Essentials",
-      issuer: "IBM",
-      date: "Oct 2023",
+      title: "Programming in Java(Elite)",
+      issuer: "IIT Kharagpur",
+      date: "Apr 2025",
       credentialId: "",
-      image: "/certificates/ibm_cloud.jpg", // Replace with your actual certificate image path
+      image: "/certificates/nptel_java.jpg", // Replace with your actual certificate image path
     },
     {
       id: 3,
@@ -30,6 +30,14 @@ const Work = () => {
       date: "Nov 2023",
       credentialId: "",
       image: "/certificates/AICTE_AIML.jpg", // Replace with your actual certificate image path
+    },
+    {
+      id: 4,
+      title: "IBM Cloud Essentials",
+      issuer: "IBM",
+      date: "Oct 2023",
+      credentialId: "",
+      image: "/certificates/ibm_cloud.jpg", // Replace with your actual certificate image path
     },
   ];
 
