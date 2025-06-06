@@ -1,11 +1,67 @@
-import React, { useState } from "react";
-import { FaGithub, FaLink, FaAward, FaTimes } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { FaGithub, FaLink, FaAward, FaTimes, FaExternalLinkAlt, FaCode, FaStar } from "react-icons/fa";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 const Work = () => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [activeProject, setActiveProject] = useState(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { scrollYProgress } = useScroll();
+  
+  // Parallax effects
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
-  // Certificate data
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  const projects = [
+    {
+      id: 1,
+      title: "Real-Time Document Sharing",
+      subtitle: "Advanced File Management System",
+      description: "A high-performance, secure, and scalable solution for seamless file handling. Features real-time uploads, intelligent sharing, role-based access control, and instant synchronization across teams.",
+      image: "/projects/file_management.png",
+      technologies: ["Tailwind CSS", "PHP", "MySQL", "WebSockets", "Redis"],
+      github: "https://github.com/hemantgowardipe/files_management_system.git",
+      live: "https://hemantgowardipe.github.io/files_management_system/",
+      features: ["Real-time collaboration", "RBAC Security", "Cloud Storage", "Version Control"],
+      category: "Full Stack",
+      status: "Production Ready"
+    },
+    {
+      id: 2,
+      title: "AI-Powered Summarizer",
+      subtitle: "Intelligent Content Compression",
+      description: "Revolutionary AI-powered text summarizer leveraging Google's Gemini API for real-time, context-aware content compression with advanced natural language processing.",
+      image: "/projects/ai_summarizer.png",
+      technologies: ["Next.js", "Gemini AI", "TailwindCSS", "React Hooks", "API Integration"],
+      github: "https://github.com/hemantgowardipe/ai_summarizer.git",
+      live: "https://ai-summarizer-seven-phi.vercel.app/",
+      features: ["AI-Powered", "Real-time Processing", "Multi-format Support", "Context Awareness"],
+      category: "AI/ML",
+      status: "Live"
+    },
+    {
+      id: 3,
+      title: "Smart Weather Assistant",
+      subtitle: "AI-Enhanced Weather Platform",
+      description: "Next-generation weather application combining real-time meteorological data with AI-driven insights and personalized recommendations for optimal user experience.",
+      image: "/projects/weather_app.png",
+      technologies: ["Next.js", "OpenAI", "React", "Weather API", "Geolocation"],
+      github: "https://github.com/hemantgowardipe/weather_app.git",
+      live: "https://weatherapp-eight-sage.vercel.app/",
+      features: ["AI Recommendations", "Real-time Data", "Location-based", "Weather Insights"],
+      category: "Web App",
+      status: "Live"
+    }
+  ];
+
   const certificates = [
     {
       id: 1,
@@ -13,381 +69,397 @@ const Work = () => {
       issuer: "IntechZia",
       date: "Summer 2024",
       credentialId: "ISO-9001 : 2005",
-      image: "/certificates/full-stack.jpg", // Replace with your actual certificate image path
+      image: "/certificates/full-stack.jpg",
+      level: "Professional",
+      skills: ["React", "Node.js", "Database Design", "System Architecture"]
     },
     {
       id: 2,
-      title: "Programming in Java(Elite)",
+      title: "Programming in Java (Elite)",
       issuer: "IIT Kharagpur",
       date: "Apr 2025",
-      credentialId: "",
-      image: "/certificates/nptel_java.jpg", // Replace with your actual certificate image path
+      credentialId: "NPTEL-ELITE-2025",
+      image: "/certificates/nptel_java.jpg",
+      level: "Elite",
+      skills: ["Core Java", "OOP", "Data Structures", "Algorithms"]
     },
     {
       id: 3,
-      title: "AIML - Virtual INternship",
-      issuer: "AICTE(AWS)",
+      title: "AIML Virtual Internship",
+      issuer: "AICTE (AWS)",
       date: "Nov 2023",
-      credentialId: "",
-      image: "/certificates/AICTE_AIML.jpg", // Replace with your actual certificate image path
+      credentialId: "AICTE-AWS-2023",
+      image: "/certificates/AICTE_AIML.jpg",
+      level: "Advanced",
+      skills: ["Machine Learning", "AI Frameworks", "Cloud Computing", "Data Science"]
     },
     {
       id: 4,
       title: "IBM Cloud Essentials",
       issuer: "IBM",
       date: "Oct 2023",
-      credentialId: "",
-      image: "/certificates/ibm_cloud.jpg", // Replace with your actual certificate image path
-    },
+      credentialId: "IBM-CLOUD-2023",
+      image: "/certificates/ibm_cloud.jpg",
+      level: "Certified",
+      skills: ["Cloud Architecture", "DevOps", "Container Orchestration", "Microservices"]
+    }
   ];
-
-  // Animation variants
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
+      transition: { staggerChildren: 0.3, delayChildren: 0.2 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 60, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { 
+        type: "spring", 
+        stiffness: 100, 
+        damping: 15,
+        duration: 0.6 
+      }
+    }
   };
 
   return (
     <section
       id="work"
-      className="relative flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#0a0a0a] to-[#121212] px-4 sm:px-6 lg:px-20 py-24 overflow-hidden"
+      className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden"
     >
-      {/* Background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-purple-900/10 blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-blue-900/10 blur-3xl"></div>
-      </div>
-
-      {/* Section title */}
-      <motion.div 
-        className="w-full text-center mb-16"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
-          My <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">Projects</span>
-        </h1>
-        <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-blue-500 mx-auto mt-4"></div>
-      </motion.div>
-
-      {/* PROJECTS SECTION */}
-      <div className="w-full space-y-20">
-        {/* FIRST PROJECT */}
-        <motion.div
-          className="relative rounded-xl overflow-hidden shadow-2xl max-w-6xl w-full mx-auto"
-          variants={cardVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm z-0"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 sm:p-12">
-            <div className="w-full md:w-1/2 flex justify-center">
-              <motion.div 
-                className="relative overflow-hidden rounded-lg border-2 border-white/10 shadow-2xl"
-                whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-              >
-                <img
-                  src="/projects/file_management.png"
-                  alt="File Management System"
-                  className="w-full h-auto max-h-[400px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <div className="p-4">
-                    <p className="text-white text-sm">Real-time file management system for seamless team collaboration</p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="w-full md:w-1/2 text-white text-center md:text-left">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-wide text-white">
-                  Real-Time <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">Document Sharing</span>
-                </h2>
-                <p className="text-gray-300 mt-4 text-sm sm:text-lg leading-relaxed">
-                  The Real-Time File Management System is a high-performance, secure,
-                  and scalable solution for seamless file handling. Supports real-time
-                  uploads, sharing, and RBAC with instant synchronization.
-                </p>
-
-                <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-6">
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    Tailwind CSS
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    PHP
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    MySQL
-                  </span>
-                </div>
-
-                <div className="flex justify-center md:justify-start space-x-6 mt-8">
-                  <motion.a
-                    href="https://github.com/hemantgowardipe/files_management_system.git"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-full border border-white/10 transition duration-300"
-                  >
-                    <FaGithub className="text-lg" /> <span>GitHub</span>
-                  </motion.a>
-                  <motion.a
-                    href="https://hemantgowardipe.github.io/files_management_system/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-5 py-3 rounded-full shadow-lg shadow-purple-500/20 transition duration-300"
-                  >
-                    <FaLink className="text-lg" /> <span>Live Demo</span>
-                  </motion.a>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* SECOND PROJECT */}
-        <motion.div
-          className="relative rounded-xl overflow-hidden shadow-2xl max-w-6xl w-full mx-auto"
-          variants={cardVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 to-purple-900/20 backdrop-blur-sm z-0"></div>
-          <div className="relative z-10 flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12 p-8 sm:p-12">
-            <div className="w-full md:w-1/2 flex justify-center">
-              <motion.div 
-                className="relative overflow-hidden rounded-lg border-2 border-white/10 shadow-2xl"
-                whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-              >
-                <img
-                  src="/projects/ai_summarizer.png"
-                  alt="E-Commerce Platform"
-                  className="w-full h-auto max-h-[400px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <div className="p-4">
-                    <p className="text-white text-sm"></p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="w-full md:w-1/2 text-white text-center md:text-left">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-wide text-white">
-                  AI - <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Summarizer</span>
-                </h2>
-                <p className="text-gray-300 mt-4 text-sm sm:text-lg leading-relaxed">
-                  Built an AI-powered text summarizer using Next.js and Google's Gemini API for real-time, intelligent content compression.
-                </p>
-
-                <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-6">
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    Next.js
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    Gemini-AI
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    TailwindCss
-                  </span>
-                </div>
-
-                <div className="flex justify-center md:justify-start space-x-6 mt-8">
-                  <motion.a
-                    href="https://github.com/hemantgowardipe/ai_summarizer.git"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-full border border-white/10 transition duration-300"
-                  >
-                    <FaGithub className="text-lg" /> <span>GitHub</span>
-                  </motion.a>
-                  <motion.a
-                    href="https://ai-summarizer-seven-phi.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-5 py-3 rounded-full shadow-lg shadow-blue-500/20 transition duration-300"
-                  >
-                    <FaLink className="text-lg" /> <span>Live Demo</span>
-                  </motion.a>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* THIRD PROJECT */}
-        <motion.div
-          className="relative rounded-xl overflow-hidden shadow-2xl max-w-6xl w-full mx-auto"
-          variants={cardVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 to-blue-900/20 backdrop-blur-sm z-0"></div>
-          <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:gap-12 p-8 sm:p-12">
-            <div className="w-full md:w-1/2 flex justify-center">
-              <motion.div 
-                className="relative overflow-hidden rounded-lg border-2 border-white/10 shadow-2xl"
-                whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
-              >
-                <img
-                  src="/projects/weather_app.png"
-                  alt="File Management System"
-                  className="w-full h-auto max-h-[400px] object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-end">
-                  <div className="p-4">
-                    <p className="text-white text-sm"></p>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <div className="w-full md:w-1/2 text-white text-center md:text-left">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                viewport={{ once: true }}
-              >
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-wide text-white">
-                  Live AI<span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-500">Assistance Weather App</span>
-                </h2>
-                <p className="text-gray-300 mt-4 text-sm sm:text-lg leading-relaxed">
-                  Crafting smart, user-centric web applications with a blend of React, Next.js, and AI-driven innovation.
-                </p>
-
-                <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-6">
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    Next.js
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    Open AI
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium bg-white/5 border border-white/10 px-4 sm:px-6 py-2 rounded-full backdrop-blur-sm">
-                    React
-                  </span>
-                </div>
-
-                <div className="flex justify-center md:justify-start space-x-6 mt-8">
-                  <motion.a
-                    href="https://github.com/hemantgowardipe/weather_app.git"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-full border border-white/10 transition duration-300"
-                  >
-                    <FaGithub className="text-lg" /> <span>GitHub</span>
-                  </motion.a>
-                  <motion.a
-                    href="https://weatherapp-eight-sage.vercel.app/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white px-5 py-3 rounded-full shadow-lg shadow-purple-500/20 transition duration-300"
-                  >
-                    <FaLink className="text-lg" /> <span>Live Demo</span>
-                  </motion.a>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* CERTIFICATES SECTION */}
-      <motion.div 
-        className="w-full mt-32"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        viewport={{ once: true }}
-      >
-        <div className="text-center mb-16">
-          <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-tight">
-            My <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">Certifications</span>
-          </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mt-4"></div>
-          <p className="text-gray-300 mt-4 max-w-2xl mx-auto">Professional certifications that validate my skills and expertise in various technologies and domains.</p>
-        </div>
-
+      {/* Dynamic background effects */}
+      <div className="absolute inset-0">
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+          className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-purple-500/30 to-blue-500/30 blur-3xl"
+          animate={{
+            x: mousePosition.x * 0.02,
+            y: mousePosition.y * 0.02,
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-3xl"
+          animate={{
+            x: mousePosition.x * -0.01,
+            y: mousePosition.y * -0.01,
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
+      </div>
+
+      {/* Floating particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 bg-white/20 rounded-full"
+            initial={{ 
+              x: Math.random() * window.innerWidth, 
+              y: Math.random() * window.innerHeight 
+            }}
+            animate={{
+              y: [null, -20, 0],
+              opacity: [0.2, 0.8, 0.2],
+            }}
+            transition={{
+              duration: 3 + Math.random() * 2,
+              repeat: Infinity,
+              delay: Math.random() * 2
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-20">
+        {/* Hero Section */}
+        <motion.div 
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+        >
+          <motion.h1 
+            className="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight mb-6"
+            style={{ y: y1 }}
+          >
+            <span className="text-white">My</span>{" "}
+            <span className="relative inline-block">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
+                Projects
+              </span>
+              <motion.div
+                className="absolute -inset-2 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-blue-400/20 blur-lg"
+                animate={{ rotate: [0, 360] }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              />
+            </span>
+          </motion.h1>
+          
+          <motion.div 
+            className="w-32 h-1.5 bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 mx-auto mb-8 rounded-full"
+            initial={{ width: 0 }}
+            animate={{ width: 128 }}
+            transition={{ duration: 1, delay: 0.5 }}
+          />
+          
+          <motion.p 
+            className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            Crafting innovative digital experiences with cutting-edge technologies 
+            and a passion for exceptional user interfaces.
+          </motion.p>
+        </motion.div>
+
+        {/* Projects Grid */}
+        <motion.div 
+          className="space-y-32 mb-32"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
         >
-          {certificates.map((cert) => (
-            <motion.div 
-              key={cert.id}
-              variants={cardVariants}
-              className="relative overflow-hidden rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 p-1"
+          {projects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              variants={itemVariants}
+              className="group relative max-w-7xl mx-auto"
+              onHoverStart={() => setActiveProject(project.id)}
+              onHoverEnd={() => setActiveProject(null)}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 opacity-30"></div>
-              <div className="relative bg-gray-900 rounded-lg p-6 h-full flex flex-col">
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-4">
-                    <FaAward className="text-2xl text-purple-400" />
-                    <span className="text-xs font-medium text-gray-400">{cert.date}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{cert.title}</h3>
-                  <p className="text-gray-400 text-sm">Issued by {cert.issuer}</p>
-                  <div className="mt-3 flex items-center">
-                    <span className="text-xs font-medium text-gray-500">Credential ID:</span>
-                    <span className="text-xs ml-2 text-gray-300">{cert.credentialId}</span>
-                  </div>
+              <div className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-12 lg:gap-16`}>
+                {/* Project Image */}
+                <div className="w-full lg:w-1/2 relative">
+                  <motion.div
+                    className="relative overflow-hidden rounded-2xl shadow-2xl group-hover:shadow-purple-500/25 transition-all duration-500"
+                    whileHover={{ scale: 1.02 }}
+                    style={{ y: index % 2 === 0 ? y1 : y2 }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-tr from-purple-500/20 to-blue-500/20 z-10" />
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-auto aspect-video object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    
+                    {/* Overlay */}
+                    <motion.div 
+                      className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-20 flex items-end opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      initial={false}
+                    >
+                      <div className="p-6 w-full">
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {project.features.map((feature, i) => (
+                            <span key={i} className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs font-medium text-white">
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+
+                    {/* Status Badge */}
+                    <div className="absolute top-4 right-4 z-30">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md ${
+                        project.status === 'Live' ? 'bg-green-500/80 text-white' : 
+                        project.status === 'Production Ready' ? 'bg-blue-500/80 text-white' : 
+                        'bg-yellow-500/80 text-black'
+                      }`}>
+                        {project.status}
+                      </span>
+                    </div>
+                  </motion.div>
                 </div>
-                <motion.button
-                  onClick={() => setSelectedCertificate(cert)}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="mt-6 w-full py-3 px-4 rounded-lg bg-gradient-to-r from-purple-600/80 to-blue-600/80 hover:from-purple-500 hover:to-blue-500 text-white text-sm font-medium backdrop-blur-sm transition duration-300 flex items-center justify-center gap-2"
-                >
-                  <span>View Certificate</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </motion.button>
+
+                {/* Project Content */}
+                <div className="w-full lg:w-1/2 text-center lg:text-left">
+                  <motion.div
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                  >
+                    <div className="mb-4">
+                      <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 backdrop-blur-sm border border-purple-500/30 mb-4">
+                        <FaCode className="mr-2" />
+                        {project.category}
+                      </span>
+                    </div>
+                    
+                    <h2 className="text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight">
+                      {project.title}
+                    </h2>
+                    
+                    <h3 className="text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 font-semibold mb-6">
+                      {project.subtitle}
+                    </h3>
+                    
+                    <p className="text-gray-300 text-lg leading-relaxed mb-8">
+                      {project.description}
+                    </p>
+
+                    {/* Technologies */}
+                    <div className="flex flex-wrap justify-center lg:justify-start gap-3 mb-8">
+                      {project.technologies.map((tech, i) => (
+                        <motion.span
+                          key={i}
+                          className="px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full text-sm font-medium text-gray-200 hover:bg-white/10 transition-colors cursor-default"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {tech}
+                        </motion.span>
+                      ))}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                      <motion.a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/20 text-white rounded-full backdrop-blur-sm transition-all duration-300"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <FaGithub className="text-xl group-hover:rotate-12 transition-transform" />
+                        <span className="font-semibold">View Code</span>
+                      </motion.a>
+                      
+                      <motion.a
+                        href={project.live}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-full shadow-lg shadow-purple-500/25 transition-all duration-300"
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <FaExternalLinkAlt className="text-xl group-hover:rotate-12 transition-transform" />
+                        <span className="font-semibold">Live Demo</span>
+                      </motion.a>
+                    </div>
+                  </motion.div>
+                </div>
               </div>
             </motion.div>
           ))}
         </motion.div>
-      </motion.div>
+
+        {/* Certificates Section */}
+        <motion.div 
+          className="relative"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+          viewport={{ once: true }}
+        >
+          <div className="text-center mb-16">
+            <motion.h2 
+              className="text-5xl lg:text-6xl font-bold text-white mb-6"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              Professional{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                Certifications
+              </span>
+            </motion.h2>
+            
+            <motion.div 
+              className="w-32 h-1.5 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 mx-auto mb-6 rounded-full"
+              initial={{ width: 0 }}
+              whileInView={{ width: 128 }}
+              transition={{ duration: 1, delay: 0.3 }}
+            />
+            
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+              Validated expertise across cutting-edge technologies and development practices
+            </p>
+          </div>
+
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            {certificates.map((cert) => (
+              <motion.div
+                key={cert.id}
+                variants={itemVariants}
+                className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl border border-white/10 hover:border-purple-500/50 transition-all duration-500"
+                whileHover={{ y: -8, scale: 1.02 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                
+                <div className="relative p-6 h-full flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <motion.div 
+                      className="p-3 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 backdrop-blur-sm"
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <FaAward className="text-2xl text-purple-400" />
+                    </motion.div>
+                    <div className="text-right">
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        cert.level === 'Elite' ? 'bg-yellow-500/20 text-yellow-300' :
+                        cert.level === 'Advanced' ? 'bg-red-500/20 text-red-300' :
+                        cert.level === 'Professional' ? 'bg-blue-500/20 text-blue-300' :
+                        'bg-green-500/20 text-green-300'
+                      }`}>
+                        {cert.level}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-1">{cert.date}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">
+                      {cert.title}
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-4">Issued by {cert.issuer}</p>
+                    
+                    <div className="mb-4">
+                      <p className="text-xs text-gray-500 mb-2">Key Skills:</p>
+                      <div className="flex flex-wrap gap-1">
+                        {cert.skills.slice(0, 2).map((skill, i) => (
+                          <span key={i} className="px-2 py-1 bg-white/5 rounded text-xs text-gray-300">
+                            {skill}
+                          </span>
+                        ))}
+                        {cert.skills.length > 2 && (
+                          <span className="px-2 py-1 bg-white/5 rounded text-xs text-gray-400">
+                            +{cert.skills.length - 2} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <motion.button
+                    onClick={() => setSelectedCertificate(cert)}
+                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600/20 to-blue-600/20 hover:from-purple-500/30 hover:to-blue-500/30 text-white text-sm font-medium backdrop-blur-sm transition-all duration-300 flex items-center justify-center gap-2 border border-white/10 group-hover:border-purple-500/30"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <span>View Certificate</span>
+                    <FaExternalLinkAlt className="text-xs" />
+                  </motion.button>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
+      </div>
 
       {/* Certificate Modal */}
       <AnimatePresence>
@@ -396,43 +468,82 @@ const Work = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
             onClick={() => setSelectedCertificate(null)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0, rotateX: -15 }}
+              animate={{ scale: 1, opacity: 1, rotateX: 0 }}
+              exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative max-w-4xl w-full bg-gray-900 rounded-xl overflow-hidden shadow-2xl"
+              className="relative max-w-5xl w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl overflow-hidden shadow-2xl border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative aspect-[4/3] w-full bg-gray-800">
-                {/* You can replace this with the actual certificate image */}
+              <div className="relative aspect-[4/3] w-full bg-gradient-to-br from-gray-800 to-gray-700">
                 <img 
                   src={selectedCertificate.image} 
                   alt={`${selectedCertificate.title} Certificate`} 
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/api/placeholder/800/600";
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
                   }}
                 />
-              </div>
-              <div className="p-6">
-                <h3 className="text-2xl font-bold text-white mb-2">{selectedCertificate.title}</h3>
-                <p className="text-gray-300">Issued by {selectedCertificate.issuer} • {selectedCertificate.date}</p>
-                <div className="mt-3 flex items-center">
-                  <span className="text-sm font-medium text-gray-400">Credential ID:</span>
-                  <span className="text-sm ml-2 text-gray-200">{selectedCertificate.credentialId}</span>
+                <div className="hidden w-full h-full items-center justify-center">
+                  <div className="text-center text-white">
+                    <FaAward className="text-6xl text-purple-400 mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold mb-2">{selectedCertificate.title}</h3>
+                    <p className="text-gray-300">Certificate preview not available</p>
+                  </div>
                 </div>
               </div>
-              <button 
-                className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full"
+              
+              <div className="p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm">
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h3 className="text-3xl font-bold text-white mb-2">{selectedCertificate.title}</h3>
+                    <p className="text-xl text-gray-300">
+                      Issued by {selectedCertificate.issuer} • {selectedCertificate.date}
+                    </p>
+                  </div>
+                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                    selectedCertificate.level === 'Elite' ? 'bg-yellow-500/20 text-yellow-300' :
+                    selectedCertificate.level === 'Advanced' ? 'bg-red-500/20 text-red-300' :
+                    selectedCertificate.level === 'Professional' ? 'bg-blue-500/20 text-blue-300' :
+                    'bg-green-500/20 text-green-300'
+                  }`}>
+                    {selectedCertificate.level}
+                  </span>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-gray-400 mb-2">Credential ID:</p>
+                    <p className="text-white font-mono bg-white/5 px-3 py-2 rounded-lg">
+                      {selectedCertificate.credentialId}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-gray-400 mb-2">Skills Validated:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedCertificate.skills.map((skill, i) => (
+                        <span key={i} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <motion.button 
+                className="absolute top-6 right-6 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-colors"
                 onClick={() => setSelectedCertificate(null)}
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
               >
-                <FaTimes />
-              </button>
+                <FaTimes className="text-lg" />
+              </motion.button>
             </motion.div>
           </motion.div>
         )}
