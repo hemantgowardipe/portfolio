@@ -20,6 +20,19 @@ const Work = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedCertificate) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedCertificate]);
+
   const projects = [
     {
       id: 1,
@@ -159,8 +172,8 @@ const Work = () => {
             key={i}
             className="absolute w-1 h-1 bg-white/20 rounded-full"
             initial={{ 
-              x: Math.random() * window.innerWidth, 
-              y: Math.random() * window.innerHeight 
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000), 
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 800)
             }}
             animate={{
               y: [null, -20, 0],
@@ -468,82 +481,92 @@ const Work = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xl"
             onClick={() => setSelectedCertificate(null)}
           >
+            {/* Modal Container with proper scrolling */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0, rotateX: -15 }}
               animate={{ scale: 1, opacity: 1, rotateX: 0 }}
               exit={{ scale: 0.8, opacity: 0, rotateX: 15 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative max-w-5xl w-full bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl overflow-hidden shadow-2xl border border-white/20"
+              className="relative w-full h-full max-w-6xl max-h-[95vh] mx-4 my-4 sm:mx-8 sm:my-8 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border border-white/20"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative aspect-[4/3] w-full bg-gradient-to-br from-gray-800 to-gray-700">
-                <img 
-                  src={selectedCertificate.image} 
-                  alt={`${selectedCertificate.title} Certificate`} 
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    e.target.nextSibling.style.display = 'flex';
-                  }}
-                />
-                <div className="hidden w-full h-full items-center justify-center">
-                  <div className="text-center text-white">
-                    <FaAward className="text-6xl text-purple-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold mb-2">{selectedCertificate.title}</h3>
-                    <p className="text-gray-300">Certificate preview not available</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-3xl font-bold text-white mb-2">{selectedCertificate.title}</h3>
-                    <p className="text-xl text-gray-300">
-                      Issued by {selectedCertificate.issuer} • {selectedCertificate.date}
-                    </p>
-                  </div>
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    selectedCertificate.level === 'Elite' ? 'bg-yellow-500/20 text-yellow-300' :
-                    selectedCertificate.level === 'Advanced' ? 'bg-red-500/20 text-red-300' :
-                    selectedCertificate.level === 'Professional' ? 'bg-blue-500/20 text-blue-300' :
-                    'bg-green-500/20 text-green-300'
-                  }`}>
-                    {selectedCertificate.level}
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-gray-400 mb-2">Credential ID:</p>
-                    <p className="text-white font-mono bg-white/5 px-3 py-2 rounded-lg">
-                      {selectedCertificate.credentialId}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-400 mb-2">Skills Validated:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCertificate.skills.map((skill, i) => (
-                        <span key={i} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
+              {/* Close Button - Fixed position with better visibility */}
               <motion.button 
-                className="absolute top-6 right-6 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full backdrop-blur-sm transition-colors"
+                className="absolute top-4 right-4 z-50 bg-black/70 hover:bg-black/90 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 border border-white/20 hover:border-white/40"
                 onClick={() => setSelectedCertificate(null)}
-                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <FaTimes className="text-lg" />
               </motion.button>
+
+              {/* Scrollable Content */}
+              <div className="h-full overflow-y-auto">
+                {/* Certificate Image */}
+                <div className="relative w-full bg-gradient-to-br from-gray-800 to-gray-700 min-h-[50vh] sm:min-h-[60vh] flex items-center justify-center">
+                  <img 
+                    src={selectedCertificate.image} 
+                    alt={`${selectedCertificate.title} Certificate`} 
+                    className="w-full h-full object-contain max-h-[70vh] p-4"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  {/* Fallback content */}
+                  <div className="hidden w-full h-full items-center justify-center p-8">
+                    <div className="text-center text-white">
+                      <FaAward className="text-6xl text-purple-400 mx-auto mb-4" />
+                      <h3 className="text-2xl font-bold mb-2">{selectedCertificate.title}</h3>
+                      <p className="text-gray-300">Certificate preview not available</p>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Certificate Details */}
+                <div className="p-6 sm:p-8 bg-gradient-to-r from-gray-900/50 to-gray-800/50 backdrop-blur-sm">
+                  <div className="flex flex-col sm:flex-row items-start justify-between gap-4 mb-6">
+                    <div className="flex-1">
+                      <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2 leading-tight">
+                        {selectedCertificate.title}
+                      </h3>
+                      <p className="text-lg sm:text-xl text-gray-300">
+                        Issued by {selectedCertificate.issuer} • {selectedCertificate.date}
+                      </p>
+                    </div>
+                    <span className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap ${
+                      selectedCertificate.level === 'Elite' ? 'bg-yellow-500/20 text-yellow-300' :
+                      selectedCertificate.level === 'Advanced' ? 'bg-red-500/20 text-red-300' :
+                      selectedCertificate.level === 'Professional' ? 'bg-blue-500/20 text-blue-300' :
+                      'bg-green-500/20 text-green-300'
+                    }`}>
+                      {selectedCertificate.level}
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <p className="text-gray-400 mb-2">Credential ID:</p>
+                      <p className="text-white font-mono bg-white/5 px-3 py-2 rounded-lg break-all">
+                        {selectedCertificate.credentialId}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-gray-400 mb-2">Skills Validated:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedCertificate.skills.map((skill, i) => (
+                          <span key={i} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
