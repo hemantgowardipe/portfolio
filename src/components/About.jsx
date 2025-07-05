@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Typewriter from "typewriter-effect";
 import { FaDownload, FaCode, FaDatabase, FaTools, FaChevronRight } from "react-icons/fa";
+import { ScrollVelocity } from "./ScrollVelocity"; // Import the ScrollVelocity component
 
 // Skills Data with categories
 const skillsData = [
@@ -31,6 +32,13 @@ const skillsData = [
       { name: "XAMPP", icon: "/svgs/xampp.svg" }
     ]
   }
+];
+
+// Skills text array for ScrollVelocity
+const skillsTexts = [
+  "React.js • Bootstrap • TailwindCSS • JavaScript • HTML5 • CSS3",
+  "PHP • MySQL • Symfony • RESTful APIs • Server Management",
+  "PhpMyAdmin • XAMPP • Git • VS Code • Responsive Design"
 ];
 
 const About = () => {
@@ -152,17 +160,6 @@ const About = () => {
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-purple-600/20 rounded-xl blur-sm group-hover:opacity-100 opacity-0 transition-opacity duration-300"></div>
                       <div className="relative flex flex-col items-center justify-center p-4 rounded-xl bg-gray-800/80 border border-white/5 hover:border-white/20 transition-all duration-300">
-                        <div className="h-14 w-14 flex items-center justify-center mb-3">
-                          <img 
-                            src={skill.icon} 
-                            alt={skill.name} 
-                            className="max-h-full max-w-full object-contain"
-                            onError={(e) => {
-                              e.target.onerror = null;
-                              e.target.src = "/api/placeholder/64/64";
-                            }}
-                          />
-                        </div>
                         <span className="text-sm font-medium text-gray-300">{skill.name}</span>
                       </div>
                     </motion.div>
@@ -347,7 +344,7 @@ const About = () => {
                   )}
                 </button>
                 
-                <button
+                {/* <button
                   onClick={() => setActiveTab("skills")}
                   className={`px-4 py-2 text-sm font-medium transition-colors duration-300 relative ${
                     activeTab === "skills" 
@@ -362,7 +359,7 @@ const About = () => {
                       className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500" 
                     />
                   )}
-                </button>
+                </button> */}
               </div>
               
               {/* Tab Content with AnimatePresence for smooth transitions */}
@@ -382,7 +379,24 @@ const About = () => {
             </div>
           </div>
         </motion.div>
+        
       </div>
+
+      {/* ScrollVelocity Skills Display - Inside content safely */}
+<div className="w-full mt-16">
+  <div className="flex items-center justify-center">
+    <ScrollVelocity
+      texts={skillsTexts}
+      velocity={50}
+      className="text-white/80"
+      numCopies={3}
+      parallaxClassName="py-8"
+      scrollerClassName="text-2xl md:text-3xl font-bold tracking-wide"
+      velocityMapping={{ input: [0, 1000], output: [0, 3] }}
+    />
+  </div>
+</div>
+
     </section>
   );
 };

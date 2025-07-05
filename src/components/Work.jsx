@@ -337,7 +337,7 @@ const Work = () => {
                         href={project.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-center justify-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/20 text-white rounded-full backdrop-blur-sm transition-all duration-300"
+                        className="group flex items-center justify-center gap-3 px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/20 text-white rounded-full backdrop-blur-sm transition-all duration-300 cursor-hover"
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -349,7 +349,7 @@ const Work = () => {
                         href={project.live}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-full shadow-lg shadow-purple-500/25 transition-all duration-300"
+                        className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white rounded-full shadow-lg shadow-purple-500/25 transition-all duration-300 cursor-hover"
                         whileHover={{ scale: 1.05, y: -2 }}
                         whileTap={{ scale: 0.98 }}
                       >
