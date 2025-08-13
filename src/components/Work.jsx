@@ -18,95 +18,37 @@ const Work = () => {
     const fetchCertificates = async () => {
       try {
         setCertificatesLoading(true);
-        console.log("🔍 Starting to fetch certificates from Supabase...");
         
-        // First, let's try to get basic info about the table
-        const { data: tableCheck, error: tableError } = await supabase
-          .from("certificates")
-          .select("count");
-        
-        console.log("🏗️ Table check:", { tableCheck, tableError });
-        
-        // Try different table names if the main one fails
-        let finalData = null;
-        let finalError = null;
-        
-        // Try "certificates" first
-        const { data: data1, error: error1 } = await supabase
+        const { data, error } = await supabase
           .from("certificates")
           .select("*")
           .order("date", { ascending: false });
-          
-        console.log("📋 Trying 'certificates' table:", { data: data1, error: error1 });
-        
-        if (error1 && error1.message?.includes('relation') && error1.message?.includes('does not exist')) {
-          // Try "certificate" (singular)
-          console.log("🔄 Trying 'certificate' table...");
-          const { data: data2, error: error2 } = await supabase
-            .from("certificate")
-            .select("*")
-            .order("date", { ascending: false });
-            
-          console.log("📋 Trying 'certificate' table:", { data: data2, error: error2 });
-          finalData = data2;
-          finalError = error2;
-        } else {
-          finalData = data1;
-          finalError = error1;
-        }
-        
-        const data = finalData;
-        const error = finalError;
-        
-        console.log("📊 Supabase response:", { data, error });
         
         if (error) {
-          console.error("❌ Error fetching certificates:", error);
-          console.error("Error details:", error.message, error.details, error.hint);
+          console.error("Error fetching certificates:", error);
+        } else if (data && data.length > 0) {
+          // Transform the data to match the expected format
+          const transformedCertificates = data.map(cert => ({
+            id: cert.id,
+            title: cert.title,
+            issuer: cert.issuer,
+            date: new Date(cert.date).toLocaleDateString('en-US', { 
+              month: 'short', 
+              year: 'numeric' 
+            }),
+            credentialId: cert.credential_id || `CERT-${cert.id}`,
+            image: cert.file_url,
+            level: cert.level || "Certified",
+            skills: cert.skills ? (Array.isArray(cert.skills) ? cert.skills : cert.skills.split(',').map(s => s.trim())) : []
+          }));
+          setCertificates(transformedCertificates);
         } else {
-          console.log("✅ Raw data from Supabase:", data);
-          console.log("📝 Number of certificates found:", data?.length || 0);
-          
-          // If data is empty but no error, might be RLS issue
-          if (data && data.length === 0) {
-            console.log("🔐 Empty result - checking if this might be an RLS issue...");
-            console.log("💡 Try running this query in your Supabase SQL editor:");
-            console.log("   SELECT * FROM certificates;");
-            console.log("💡 If you see data there but not here, RLS might be enabled.");
-            console.log("💡 Check: Database → certificates table → Settings → Enable RLS");
-          }
-          
-          if (data && data.length > 0) {
-            // Transform the data to match the expected format
-            const transformedCertificates = data.map(cert => {
-              console.log("🔄 Transforming certificate:", cert);
-              return {
-                id: cert.id,
-                title: cert.title,
-                issuer: cert.issuer,
-                date: new Date(cert.date).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  year: 'numeric' 
-                }),
-                credentialId: cert.credential_id || `CERT-${cert.id}`,
-                image: cert.file_url, // Use file_url as the certificate image
-                level: cert.level || "Certified", // Default level if not provided
-                skills: cert.skills ? (Array.isArray(cert.skills) ? cert.skills : cert.skills.split(',').map(s => s.trim())) : []
-              };
-            });
-            console.log("🎯 Transformed certificates:", transformedCertificates);
-            setCertificates(transformedCertificates);
-          } else {
-            console.log("📭 No certificates found in database");
-            setCertificates([]);
-          }
+          setCertificates([]);
         }
       } catch (error) {
-        console.error("💥 Unexpected error fetching certificates:", error);
-        console.error("Error stack:", error.stack);
+        console.error("Error fetching certificates:", error);
       } finally {
         setCertificatesLoading(false);
-        console.log("🏁 Finished fetching certificates, loading set to false");
       }
     };
 
@@ -397,14 +339,6 @@ const Work = () => {
             </p>
           </div>
 
-          {/* Debug Info - Remove this after fixing */}
-          <div className="mb-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg text-sm">
-            <p><strong>Debug Info:</strong></p>
-            <p>Loading: {certificatesLoading ? 'true' : 'false'}</p>
-            <p>Certificates count: {certificates.length}</p>
-            <p>Check browser console for detailed logs</p>
-          </div>
-
           {/* Show loading skeleton while fetching */}
           {certificatesLoading ? (
             <CertificatesSkeleton />
@@ -477,11 +411,7 @@ const Work = () => {
                     </div>
                     
                     <motion.button
-                      onClick={() => {
-                        console.log("🖼️ Opening certificate modal for:", cert);
-                        console.log("📸 Image URL:", cert.image);
-                        setSelectedCertificate(cert);
-                      }}
+                      onClick={() => setSelectedCertificate(cert)}
                       className="w-full py-2.5 px-4 rounded-lg bg-gray-100 dark:bg-gray-900 hover:bg-gray-200 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 border border-gray-200 dark:border-gray-800"
                       whileHover={{ y: -1 }}
                       whileTap={{ scale: 0.98 }}
