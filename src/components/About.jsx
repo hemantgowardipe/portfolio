@@ -1,54 +1,156 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Typewriter from "typewriter-effect";
 import { FaDownload, FaCode, FaDatabase, FaTools, FaChevronRight, FaMapMarkerAlt, FaEnvelope, FaGraduationCap, FaCalendarAlt } from "react-icons/fa";
-
-
-// Skills Data with categories
-const skillsData = [
-  {
-    category: "Frontend",
-    icon: <FaCode className="text-blue-600 dark:text-blue-400" />,
-    items: [
-      { name: "React.js", icon: "/svgs/react.svg" },
-      { name: "Bootstrap", icon: "/svgs/boostrap.svg" },
-      { name: "TailwindCSS", icon: "/svgs/tailwindcss.svg" }
-    ]
-  },
-  {
-    category: "Backend",
-    icon: <FaDatabase className="text-purple-600 dark:text-purple-400" />,
-    items: [
-      { name: "PHP", icon: "/svgs/php.svg" },
-      { name: "MySQL", icon: "/svgs/mysql (1).svg" },
-      { name: "Symfony", icon: "/svgs/symphony.svg" },
-      { name: "Laravel", icon: "/svgs/laravel.svg" },
-      { name: "RESTful APIs", icon: "/svgs/flask.svg" }
-    ]
-  },
-  {
-    category: "Tools",
-    icon: <FaTools className="text-green-600 dark:text-green-400" />,
-    items: [
-      { name: "PhpMyAdmin", icon: "/svgs/phpmyadmin.svg" },
-      { name: "XAMPP", icon: "/svgs/xampp.svg" },
-      { name: "Git", icon: "/svgs/git.svg" },
-      { name: "VS Code", icon: "/svgs/vscode.svg" },
-      { name: "Responsive Design", icon: "/svgs/responsive.svg" }
-    ]
-  }
-];
-
-// Skills text array for ScrollVelocity
-// const skillsTexts = [
-//   "React.js • Bootstrap • TailwindCSS • JavaScript • HTML5 • CSS3",
-//   "PHP • MySQL • Symfony • RESTful APIs • Server Management",
-//   "PhpMyAdmin • XAMPP • Git • VS Code • Responsive Design"
-// ];
+import { supabase } from "../supabaseClient"; // Import Supabase client
 
 const About = () => {
   const [activeTab, setActiveTab] = useState("about");
   const aboutRef = useRef(null);
+  const [photos, setPhotos] = useState([]);
+  const [skillsData, setSkillsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        fetchPhotos(),
+        fetchProgrammingSkills(),
+        fetchFrontendSkills(),
+        fetchBackendSkills(),
+        fetchFrameworkSkills()
+      ]);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const fetchPhotos = async () => {
+    const { data, error } = await supabase
+      .from("profile-photo") // table name
+      .select("image_url"); // column name
+
+    if (error) {
+      console.error("Error fetching profile photos:", error);
+    } else {
+      setPhotos(data);
+    }
+  };
+
+  const fetchProgrammingSkills = async () => {
+    const { data, error } = await supabase
+      .from("programming-skills")
+      .select("icon_url");
+
+    if (error) {
+      console.error("Error fetching programming skills:", error);
+      return [];
+    }
+    return data || [];
+  };
+
+  const fetchFrontendSkills = async () => {
+    const { data, error } = await supabase
+      .from("frontend-skills")
+      .select("icon_url");
+
+    if (error) {
+      console.error("Error fetching frontend skills:", error);
+      return [];
+    }
+    return data || [];
+  };
+
+  const fetchBackendSkills = async () => {
+    const { data, error } = await supabase
+      .from("backend-skills")
+      .select("icon_url");
+
+    if (error) {
+      console.error("Error fetching backend skills:", error);
+      return [];
+    }
+    return data || [];
+  };
+
+  const fetchFrameworkSkills = async () => {
+    const { data, error } = await supabase
+      .from("framework-skills")
+      .select("icon_url");
+
+    if (error) {
+      console.error("Error fetching framework skills:", error);
+      return [];
+    }
+    return data || [];
+  };
+
+  // Fetch all skills and organize them by category
+  const organizeSkillsData = async () => {
+    const [programmingSkills, frontendSkills, backendSkills, frameworkSkills] = await Promise.all([
+      fetchProgrammingSkills(),
+      fetchFrontendSkills(),
+      fetchBackendSkills(),
+      fetchFrameworkSkills()
+    ]);
+
+    const organizedSkills = [];
+
+    // Add Programming Skills category if there are skills
+    if (programmingSkills.length > 0) {
+      organizedSkills.push({
+        category: "Programming",
+        icon: <FaCode className="text-blue-600 dark:text-blue-400" />,
+        items: programmingSkills.map((skill, index) => ({
+          name: `Skill ${index + 1}`, // Generic name since we don't have skill names
+          icon: skill.icon_url
+        }))
+      });
+    }
+
+    // Add Frontend category if there are skills
+    if (frontendSkills.length > 0) {
+      organizedSkills.push({
+        category: "Frontend",
+        icon: <FaCode className="text-green-600 dark:text-green-400" />,
+        items: frontendSkills.map((skill, index) => ({
+          name: `Frontend ${index + 1}`, // Generic name since we don't have skill names
+          icon: skill.icon_url
+        }))
+      });
+    }
+
+    // Add Backend category if there are skills
+    if (backendSkills.length > 0) {
+      organizedSkills.push({
+        category: "Backend",
+        icon: <FaDatabase className="text-purple-600 dark:text-purple-400" />,
+        items: backendSkills.map((skill, index) => ({
+          name: `Backend ${index + 1}`, // Generic name since we don't have skill names
+          icon: skill.icon_url
+        }))
+      });
+    }
+
+    // Add Framework category if there are skills
+    if (frameworkSkills.length > 0) {
+      organizedSkills.push({
+        category: "Frameworks",
+        icon: <FaTools className="text-orange-600 dark:text-orange-400" />,
+        items: frameworkSkills.map((skill, index) => ({
+          name: `Framework ${index + 1}`, // Generic name since we don't have skill names
+          icon: skill.icon_url
+        }))
+      });
+    }
+
+    setSkillsData(organizedSkills);
+  };
+
+  useEffect(() => {
+    organizeSkillsData();
+  }, []);
 
   // Animations
   const containerVariants = {
@@ -176,45 +278,57 @@ const About = () => {
             animate="visible"
             className="space-y-8"
           >
-            {skillsData.map((category, idx) => (
-              <motion.div 
-                key={idx} 
-                variants={itemVariants} 
-                className="space-y-4"
-              >
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-3">
-                  {category.icon}
-                  {category.category}
-                </h3>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {category.items.map((skill, index) => (
-                    <motion.div
-                      key={index}
-                      whileHover={{ 
-                        y: -2,
-                        scale: 1.05,
-                        transition: { duration: 0.2 }
-                      }}
-                      className="group relative"
-                      title={skill.name} // Tooltip on hover to show skill name
-                    >
-                      <div className="flex items-center justify-center p-4 rounded-lg bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-md transition-all duration-200">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+                <span className="ml-3 text-gray-600 dark:text-gray-400">Loading skills...</span>
+              </div>
+            ) : skillsData.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 dark:text-gray-400">No skills found. Please add skills to your database.</p>
+              </div>
+            ) : (
+              skillsData.map((category, idx) => (
+                <motion.div 
+                  key={idx} 
+                  variants={itemVariants} 
+                  className="space-y-4"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-3">
+                    {category.icon}
+                    {category.category}
+                    <span className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+                      ({category.items.length})
+                    </span>
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-6">
+                    {category.items.map((skill, index) => (
+                      <motion.div
+                        key={index}
+                        whileHover={{ 
+                          y: -2,
+                          scale: 1.1,
+                          transition: { duration: 0.2 }
+                        }}
+                        className="group relative"
+                      >
                         <img 
                           src={skill.icon} 
-                          alt={skill.name}
-                          className="w-8 h-8 object-contain"
+                          alt={`Skill icon`}
+                          className="w-12 h-12 object-contain hover:opacity-80 transition-opacity duration-200"
                           onError={(e) => {
                             e.target.onerror = null;
-                            e.target.style.display = 'none';
+                            // Fallback to a default icon or hide the image
+                            e.target.src = '/svgs/default-skill.svg';
                           }}
                         />
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))
+            )}
           </motion.div>
         );
         
@@ -261,15 +375,20 @@ const About = () => {
                 {/* Profile Image */}
                 <div className="flex justify-center mb-6">
                   <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden border-4 border-gray-100 dark:border-gray-800 shadow-lg">
-                    <img 
-                      src="/images/profile.jpg" 
-                      alt="Hemant Gowardipe" 
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/api/placeholder/160/160";
-                      }} 
-                    />
+                    {photos.length > 0 ? (
+                      photos.map((photo, index) => (
+                      <img 
+                        key={index}
+                        src={photo.image_url}
+                        alt="Hemant Gowardipe - Full Stack PHP Developer" 
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      />
+                      ))
+                    ) : (
+                      <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                        <span className="text-gray-400 text-sm">No photo</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 

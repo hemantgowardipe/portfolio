@@ -1,9 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FaGithub, FaLinkedin, FaArrowDown, FaMapMarkerAlt, FaEnvelope } from "react-icons/fa";
-
+import { supabase } from "../supabaseClient"; // Add this import
 const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [photos, setPhotos] = useState([]);
+
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      const { data, error } = await supabase
+        .from("profile-photo") // table name
+        .select("image_url"); // column name
+
+      if (error) {
+        console.error("Error fetching profile photos:", error);
+      } else {
+        setPhotos(data);
+      }
+    };
+
+    fetchPhotos();
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -111,11 +128,18 @@ const Hero = () => {
           >
             <div className="relative w-36 h-36 mx-auto">
               <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-xl shadow-gray-200/50">
+              {photos.length > 0 ? (
+                photos.map((photo, index) => (
                 <img 
-                  src="/images/sora_img.png" 
+                  key={index}
+                  src={photo.image_url}
                   alt="Hemant Gowardipe - Full Stack PHP Developer" 
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 />
+                ))
+              ) : (
+                <p>No profile photos found.</p>
+              )}
               </div>
               {/* Subtle Ring */}
               <div className="absolute inset-0 rounded-full border-2 border-gray-100/80 pointer-events-none" />
