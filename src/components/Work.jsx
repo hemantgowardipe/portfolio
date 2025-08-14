@@ -6,12 +6,56 @@ import { supabase } from "../supabaseClient"; // Add this import
 const Work = () => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [activeProject, setActiveProject] = useState(null);
-  const [certificates, setCertificates] = useState([]); // Changed from hardcoded to state
-  const [certificatesLoading, setCertificatesLoading] = useState(true); // Add loading state
+  const [certificates, setCertificates] = useState([]);
+  const [certificatesLoading, setCertificatesLoading] = useState(true);
+  const [projects, setProjects] = useState([]); // Changed from hardcoded to state
+  const [projectsLoading, setProjectsLoading] = useState(true); // Add loading state for projects
   const { scrollYProgress } = useScroll();
   
   // Subtle parallax effects
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -50]);
+
+  // Fetch projects from Supabase
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setProjectsLoading(true);
+        
+        const { data, error } = await supabase
+          .from("projects")
+          .select("*")
+          .order("display_order", { ascending: true });
+        
+        if (error) {
+          console.error("Error fetching projects:", error);
+        } else if (data && data.length > 0) {
+          // Transform the data to match the expected format
+          const transformedProjects = data.map(project => ({
+            id: project.id,
+            title: project.title,
+            subtitle: project.subtitle,
+            description: project.description,
+            image: project.image_url,
+            technologies: Array.isArray(project.technologies) ? project.technologies : [],
+            github: project.github_url,
+            live: project.live_url,
+            features: Array.isArray(project.features) ? project.features : [],
+            category: project.category,
+            status: project.status
+          }));
+          setProjects(transformedProjects);
+        } else {
+          setProjects([]);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setProjectsLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   // Fetch certificates from Supabase
   useEffect(() => {
@@ -68,48 +112,6 @@ const Work = () => {
     };
   }, [selectedCertificate]);
 
-  const projects = [
-    {
-      id: 1,
-      title: "Real-Time Document Sharing",
-      subtitle: "Advanced File Management System",
-      description: "A high-performance, secure, and scalable solution for seamless file handling. Features real-time uploads, intelligent sharing, role-based access control, and instant synchronization across teams.",
-      image: "/projects/file_management.png",
-      technologies: ["Tailwind CSS", "PHP", "MySQL", "WebSockets", "Redis"],
-      github: "https://github.com/hemantgowardipe/files_management_system.git",
-      live: "https://hemantgowardipe.github.io/files_management_system/",
-      features: ["Real-time collaboration", "RBAC Security", "Cloud Storage", "Version Control"],
-      category: "Full Stack",
-      status: "Production Ready"
-    },
-    {
-      id: 2,
-      title: "AI-Powered Summarizer",
-      subtitle: "Intelligent Content Compression",
-      description: "Revolutionary AI-powered text summarizer leveraging Google's Gemini API for real-time, context-aware content compression with advanced natural language processing.",
-      image: "/projects/ai_summarizer.png",
-      technologies: ["Next.js", "Gemini AI", "TailwindCSS", "React Hooks", "API Integration"],
-      github: "https://github.com/hemantgowardipe/ai_summarizer.git",
-      live: "https://ai-summarizer-seven-phi.vercel.app/",
-      features: ["AI-Powered", "Real-time Processing", "Multi-format Support", "Context Awareness"],
-      category: "AI/ML",
-      status: "Live"
-    },
-    {
-      id: 3,
-      title: "Smart Weather Assistant",
-      subtitle: "AI-Enhanced Weather Platform",
-      description: "Next-generation weather application combining real-time meteorological data with AI-driven insights and personalized recommendations for optimal user experience.",
-      image: "/projects/weather_app.png",
-      technologies: ["Next.js", "OpenAI", "React", "Weather API", "Geolocation"],
-      github: "https://github.com/hemantgowardipe/weather_app.git",
-      live: "https://weatherapp-eight-sage.vercel.app/",
-      features: ["AI Recommendations", "Real-time Data", "Location-based", "Weather Insights"],
-      category: "Web App",
-      status: "Live"
-    }
-  ];
-
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -129,6 +131,38 @@ const Work = () => {
       }
     }
   };
+
+  // Loading skeleton component for projects
+  const ProjectsSkeleton = () => (
+    <div className="space-y-24 lg:space-y-32">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="animate-pulse">
+            <div className="w-full h-64 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
+          </div>
+          <div className="animate-pulse space-y-4">
+            <div className="w-24 h-6 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            <div className="w-3/4 h-8 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            <div className="w-1/2 h-6 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            <div className="space-y-2">
+              <div className="w-full h-4 bg-gray-200 dark:bg-gray-800 rounded"></div>
+              <div className="w-4/5 h-4 bg-gray-200 dark:bg-gray-800 rounded"></div>
+              <div className="w-3/4 h-4 bg-gray-200 dark:bg-gray-800 rounded"></div>
+            </div>
+            <div className="flex gap-2">
+              <div className="w-16 h-6 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+              <div className="w-12 h-6 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+              <div className="w-20 h-6 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+            </div>
+            <div className="flex gap-3">
+              <div className="w-32 h-10 bg-gray-200 dark:bg-gray-800 rounded-lg"></div>
+              <div className="w-32 h-10 bg-gray-200 dark:bg-gray-800 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   // Loading skeleton component for certificates
   const CertificatesSkeleton = () => (
@@ -196,125 +230,140 @@ const Work = () => {
         </motion.div>
 
         {/* Projects Grid */}
-        <motion.div 
-          className="space-y-24 lg:space-y-32 mb-24 lg:mb-32"
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-        >
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              variants={itemVariants}
-              className="group"
-            >
-              <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${
-                index % 2 === 1 ? 'lg:grid-flow-col lg:grid-cols-2' : ''
-              }`}>
-                {/* Project Image */}
-                <div className={`${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <motion.div
-                    className="relative overflow-hidden rounded-xl lg:rounded-2xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300"
-                    whileHover={{ y: -4 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  >
-                    <img
-                      src={project.image}
-                      alt={project.title}
-                      className="w-full h-auto aspect-video object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    
-                    {/* Subtle overlay on hover */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300" />
-
-                    {/* Status Badge */}
-                    <div className="absolute top-4 right-4">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                        project.status === 'Live' 
-                          ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800' 
-                          : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
-                      }`}>
-                        <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
-                          project.status === 'Live' ? 'bg-green-500' : 'bg-blue-500'
-                        }`} />
-                        {project.status}
-                      </span>
-                    </div>
-                  </motion.div>
-                </div>
-
-                {/* Project Content */}
-                <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
-                  <motion.div
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.5, delay: 0.1 }}
-                  >
-                    <div className="mb-4">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800">
-                        <FaCode className="mr-2 text-xs" />
-                        {project.category}
-                      </span>
-                    </div>
-                    
-                    <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 dark:text-white mb-2 tracking-tight">
-                      {project.title}
-                    </h2>
-                    
-                    <h3 className="text-lg text-gray-600 dark:text-gray-400 font-medium mb-4">
-                      {project.subtitle}
-                    </h3>
-                    
-                    <p className="text-gray-600 dark:text-gray-400 text-base lg:text-lg leading-relaxed mb-6">
-                      {project.description}
-                    </p>
-
-                    {/* Technologies */}
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {project.technologies.map((tech, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-full text-sm border border-gray-200 dark:border-gray-800"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-3">
-                      <motion.a
-                        href={project.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 font-medium"
-                        whileHover={{ y: -1 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <FaGithub className="text-lg" />
-                        View Code
-                      </motion.a>
+        {projectsLoading ? (
+          <div className="mb-24 lg:mb-32">
+            <ProjectsSkeleton />
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="text-center py-12 mb-24 lg:mb-32">
+            <FaCode className="text-4xl text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400">No projects found. Please add projects to your database.</p>
+          </div>
+        ) : (
+          <motion.div 
+            className="space-y-24 lg:space-y-32 mb-24 lg:mb-32"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+          >
+            {projects.map((project, index) => (
+              <motion.div
+                key={project.id}
+                variants={itemVariants}
+                className="group"
+              >
+                <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${
+                  index % 2 === 1 ? 'lg:grid-flow-col lg:grid-cols-2' : ''
+                }`}>
+                  {/* Project Image */}
+                  <div className={`${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                    <motion.div
+                      className="relative overflow-hidden rounded-xl lg:rounded-2xl bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-md transition-all duration-300"
+                      whileHover={{ y: -4 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    >
+                      <img
+                        src={project.image}
+                        alt={project.title}
+                        className="w-full h-auto aspect-video object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/projects/placeholder.png';
+                        }}
+                      />
                       
-                      <motion.a
-                        href={project.live}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 font-medium"
-                        whileHover={{ y: -1 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <FaExternalLinkAlt className="text-sm" />
-                        Live Demo
-                        <FaArrowRight className="text-sm transition-transform group-hover:translate-x-1" />
-                      </motion.a>
-                    </div>
-                  </motion.div>
+                      {/* Subtle overlay on hover */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300" />
+
+                      {/* Status Badge */}
+                      <div className="absolute top-4 right-4">
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                          project.status === 'Live' 
+                            ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800' 
+                            : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800'
+                        }`}>
+                          <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                            project.status === 'Live' ? 'bg-green-500' : 'bg-blue-500'
+                          }`} />
+                          {project.status}
+                        </span>
+                      </div>
+                    </motion.div>
+                  </div>
+
+                  {/* Project Content */}
+                  <div className={`${index % 2 === 1 ? 'lg:order-1' : ''}`}>
+                    <motion.div
+                      initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.1 }}
+                    >
+                      <div className="mb-4">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-800">
+                          <FaCode className="mr-2 text-xs" />
+                          {project.category}
+                        </span>
+                      </div>
+                      
+                      <h2 className="text-3xl lg:text-4xl font-semibold text-gray-900 dark:text-white mb-2 tracking-tight">
+                        {project.title}
+                      </h2>
+                      
+                      <h3 className="text-lg text-gray-600 dark:text-gray-400 font-medium mb-4">
+                        {project.subtitle}
+                      </h3>
+                      
+                      <p className="text-gray-600 dark:text-gray-400 text-base lg:text-lg leading-relaxed mb-6">
+                        {project.description}
+                      </p>
+
+                      {/* Technologies */}
+                      <div className="flex flex-wrap gap-2 mb-8">
+                        {project.technologies.map((tech, i) => (
+                          <span
+                            key={i}
+                            className="px-3 py-1 bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded-full text-sm border border-gray-200 dark:border-gray-800"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <motion.a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-900 transition-all duration-200 font-medium"
+                          whileHover={{ y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <FaGithub className="text-lg" />
+                          View Code
+                        </motion.a>
+                        
+                        <motion.a
+                          href={project.live}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-black dark:bg-white text-white dark:text-black rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-all duration-200 font-medium"
+                          whileHover={{ y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <FaExternalLinkAlt className="text-sm" />
+                          Live Demo
+                          <FaArrowRight className="text-sm transition-transform group-hover:translate-x-1" />
+                        </motion.a>
+                      </div>
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
 
         {/* Certificates Section */}
         <motion.div 

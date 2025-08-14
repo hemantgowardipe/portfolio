@@ -190,7 +190,7 @@ const Hero = () => {
             Passionate about clean code, modern technologies, and solving complex problems.
           </motion.p>
 
-          {/* CTA Buttons */}
+          {/* CTA Buttons
           <motion.div
             className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 mb-12"
             initial={{ opacity: 0, y: 20 }}
@@ -214,7 +214,7 @@ const Hero = () => {
             >
               View projects
             </motion.button>
-          </motion.div>
+          </motion.div> */}
 
           {/* Tech Stack */}
           <motion.div
