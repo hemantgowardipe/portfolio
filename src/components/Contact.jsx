@@ -42,15 +42,28 @@ const Contact = () => {
       {/* Social Icons */}
       <div className="mt-10 flex space-x-8">
         {[
-          { icon: <FaGithub size={40} />, link: "https://github.com/hemantgowardipe" },
-          { icon: <FaLinkedin size={40} />, link: "https://linkedin.com/in/hemant-gowardipe-96614b24a" },
-          { icon: <FaInstagram size={40} />, link: "https://www.instagram.com/hemant_gowardipe/" },
-        ].map(({ icon, link }, index) => (
+          {
+            icon: <FaGithub size={40} aria-hidden="true" />,
+            link: "https://github.com/hemantgowardipe",
+            label: "Open GitHub profile of Hemant Gowardipe",
+          },
+          {
+            icon: <FaLinkedin size={40} aria-hidden="true" />,
+            link: "https://linkedin.com/in/hemant-gowardipe-96614b24a",
+            label: "Open LinkedIn profile of Hemant Gowardipe",
+          },
+          {
+            icon: <FaInstagram size={40} aria-hidden="true" />,
+            link: "https://www.instagram.com/hemant_gowardipe/",
+            label: "Open Instagram profile of Hemant Gowardipe",
+          },
+        ].map(({ icon, link, label }, index) => (
           <motion.a
             key={index}
             href={link}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label={label}              // ✅ Added accessibility label
             className="text-[#e5e1dc] transition transform hover:text-white hover:scale-110"
             whileHover={{ scale: 1.2, color: "#ffffff" }}
           >
