@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaGithub, FaLink, FaAward, FaTimes, FaExternalLinkAlt, FaCode, FaStar, FaArrowRight } from "react-icons/fa";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { supabase } from "../supabaseClient"; // Add this import
+// import { supabase } from "../supabaseClient"; // Add this import
 
 const Work = () => {
   const [selectedCertificate, setSelectedCertificate] = useState(null);
@@ -17,87 +17,82 @@ const Work = () => {
 
   // Fetch projects from Supabase
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setProjectsLoading(true);
-        
-        const { data, error } = await supabase
-          .from("projects")
-          .select("*")
-          .order("display_order", { ascending: true });
-        
-        if (error) {
-          console.error("Error fetching projects:", error);
-        } else if (data && data.length > 0) {
-          // Transform the data to match the expected format
-          const transformedProjects = data.map(project => ({
-            id: project.id,
-            title: project.title,
-            subtitle: project.subtitle,
-            description: project.description,
-            image: project.image_url,
-            technologies: Array.isArray(project.technologies) ? project.technologies : [],
-            github: project.github_url,
-            live: project.live_url,
-            features: Array.isArray(project.features) ? project.features : [],
-            category: project.category,
-            status: project.status
-          }));
-          setProjects(transformedProjects);
-        } else {
-          setProjects([]);
-        }
-      } catch (error) {
-        console.error("Error fetching projects:", error);
-      } finally {
-        setProjectsLoading(false);
-      }
-    };
+  const fetchProjects = async () => {
+    try {
+      setProjectsLoading(true);
 
-    fetchProjects();
-  }, []);
+      const response = await fetch(
+        "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=projects"
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const transformedProjects = data.map(project => ({
+          id: project.id,
+          title: project.title,
+          subtitle: project.subtitle,
+          description: project.description,
+          image: project.image_url,
+          technologies: Array.isArray(project.technologies) ? project.technologies : [],
+          github: project.github_url,
+          live: project.live_url,
+          features: Array.isArray(project.features) ? project.features : [],
+          category: project.category,
+          status: project.status
+        }));
+        setProjects(transformedProjects);
+      } else {
+        setProjects([]);
+      }
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  fetchProjects();
+}, []);
+
 
   // Fetch certificates from Supabase
   useEffect(() => {
-    const fetchCertificates = async () => {
-      try {
-        setCertificatesLoading(true);
-        
-        const { data, error } = await supabase
-          .from("certificates")
-          .select("*")
-          .order("date", { ascending: false });
-        
-        if (error) {
-          console.error("Error fetching certificates:", error);
-        } else if (data && data.length > 0) {
-          // Transform the data to match the expected format
-          const transformedCertificates = data.map(cert => ({
-            id: cert.id,
-            title: cert.title,
-            issuer: cert.issuer,
-            date: new Date(cert.date).toLocaleDateString('en-US', { 
-              month: 'short', 
-              year: 'numeric' 
-            }),
-            credentialId: cert.credential_id || `CERT-${cert.id}`,
-            image: cert.file_url,
-            level: cert.level || "Certified",
-            skills: cert.skills ? (Array.isArray(cert.skills) ? cert.skills : cert.skills.split(',').map(s => s.trim())) : []
-          }));
-          setCertificates(transformedCertificates);
-        } else {
-          setCertificates([]);
-        }
-      } catch (error) {
-        console.error("Error fetching certificates:", error);
-      } finally {
-        setCertificatesLoading(false);
-      }
-    };
+  const fetchCertificates = async () => {
+    try {
+      setCertificatesLoading(true);
 
-    fetchCertificates();
-  }, []);
+      const response = await fetch(
+        "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=certificates"
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        const transformedCertificates = data.map(cert => ({
+          id: cert.id,
+          title: cert.title,
+          issuer: cert.issuer,
+          date: new Date(cert.date).toLocaleDateString('en-US', {
+            month: 'short',
+            year: 'numeric'
+          }),
+          credentialId: cert.credential_id || `CERT-${cert.id}`,
+          image: cert.file_url,
+          level: cert.level || "Certified",
+          skills: cert.skills ? (Array.isArray(cert.skills) ? cert.skills : cert.skills.split(',').map(s => s.trim())) : []
+        }));
+        setCertificates(transformedCertificates);
+      } else {
+        setCertificates([]);
+      }
+    } catch (error) {
+      console.error("Error fetching certificates:", error);
+    } finally {
+      setCertificatesLoading(false);
+    }
+  };
+
+  fetchCertificates();
+}, []);
 
   // Prevent body scroll when modal is open
   useEffect(() => {

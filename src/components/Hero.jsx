@@ -7,21 +7,22 @@ const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [photos, setPhotos] = useState([]);
 
-  useEffect(() => {
-    const fetchPhotos = async () => {
-      const { data, error } = await supabase
-        .from("profile-photo")
-        .select("image_url");
+useEffect(() => {
+  const fetchPhotos = async () => {
+    try {
+      const response = await fetch(
+        "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=profile"
+      );
+      const data = await response.json();
+      setPhotos(data);
+    } catch (error) {
+      console.error("Error fetching profile photo:", error);
+    }
+  };
 
-      if (error) {
-        console.error("Error fetching profile photos:", error);
-      } else {
-        setPhotos(data);
-      }
-    };
+  fetchPhotos();
+}, []);
 
-    fetchPhotos();
-  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {

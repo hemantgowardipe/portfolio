@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Typewriter from "typewriter-effect";
 import { FaDownload, FaCode, FaDatabase, FaTools, FaChevronRight, FaMapMarkerAlt, FaEnvelope, FaGraduationCap, FaCalendarAlt } from "react-icons/fa";
-import { supabase } from "../supabaseClient"; // Import Supabase client
 
 const About = () => {
   const [activeTab, setActiveTab] = useState("about");
@@ -12,145 +11,67 @@ const About = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await Promise.all([
-        fetchPhotos(),
-        fetchProgrammingSkills(),
-        fetchFrontendSkills(),
-        fetchBackendSkills(),
-        fetchFrameworkSkills()
-      ]);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+
+      const skillsResponse = await fetch(
+        "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=skills"
+      );
+      const skillsJson = await skillsResponse.json();
+
+      const profileResponse = await fetch(
+        "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=profile"
+      );
+      const profileJson = await profileResponse.json();
+      
+      setPhotos(profileJson);
+
+      const organizedSkills = [
+        {
+          category: "Programming",
+          icon: <FaCode className="text-blue-600 dark:text-blue-400" />,
+          items: skillsJson.programming.map((item, i) => ({
+            name: `Skill ${i + 1}`,
+            icon: item.icon_url
+          }))
+        },
+        {
+          category: "Frontend",
+          icon: <FaCode className="text-green-600 dark:text-green-400" />,
+          items: skillsJson.frontend.map((item, i) => ({
+            name: `Skill ${i + 1}`,
+            icon: item.icon_url
+          }))
+        },
+        {
+          category: "Backend",
+          icon: <FaDatabase className="text-purple-600 dark:text-purple-400" />,
+          items: skillsJson.backend.map((item, i) => ({
+            name: `Skill ${i + 1}`,
+            icon: item.icon_url
+          }))
+        },
+        {
+          category: "Frameworks",
+          icon: <FaTools className="text-orange-600 dark:text-orange-400" />,
+          items: skillsJson.framework.map((item, i) => ({
+            name: `Skill ${i + 1}`,
+            icon: item.icon_url
+          }))
+        }
+      ];
+
+      setSkillsData(organizedSkills);
+    } catch (err) {
+      console.error("Error loading About data:", err);
+    } finally {
       setLoading(false);
-    };
-
-    fetchData();
-  }, []);
-
-  const fetchPhotos = async () => {
-    const { data, error } = await supabase
-      .from("profile-photo") // table name
-      .select("image_url"); // column name
-
-    if (error) {
-      console.error("Error fetching profile photos:", error);
-    } else {
-      setPhotos(data);
     }
   };
 
-  const fetchProgrammingSkills = async () => {
-    const { data, error } = await supabase
-      .from("programming-skills")
-      .select("icon_url");
-
-    if (error) {
-      console.error("Error fetching programming skills:", error);
-      return [];
-    }
-    return data || [];
-  };
-
-  const fetchFrontendSkills = async () => {
-    const { data, error } = await supabase
-      .from("frontend-skills")
-      .select("icon_url");
-
-    if (error) {
-      console.error("Error fetching frontend skills:", error);
-      return [];
-    }
-    return data || [];
-  };
-
-  const fetchBackendSkills = async () => {
-    const { data, error } = await supabase
-      .from("backend-skills")
-      .select("icon_url");
-
-    if (error) {
-      console.error("Error fetching backend skills:", error);
-      return [];
-    }
-    return data || [];
-  };
-
-  const fetchFrameworkSkills = async () => {
-    const { data, error } = await supabase
-      .from("framework-skills")
-      .select("icon_url");
-
-    if (error) {
-      console.error("Error fetching framework skills:", error);
-      return [];
-    }
-    return data || [];
-  };
-
-  // Fetch all skills and organize them by category
-  const organizeSkillsData = async () => {
-    const [programmingSkills, frontendSkills, backendSkills, frameworkSkills] = await Promise.all([
-      fetchProgrammingSkills(),
-      fetchFrontendSkills(),
-      fetchBackendSkills(),
-      fetchFrameworkSkills()
-    ]);
-
-    const organizedSkills = [];
-
-    // Add Programming Skills category if there are skills
-    if (programmingSkills.length > 0) {
-      organizedSkills.push({
-        category: "Programming",
-        icon: <FaCode className="text-blue-600 dark:text-blue-400" />,
-        items: programmingSkills.map((skill, index) => ({
-          name: `Skill ${index + 1}`, // Generic name since we don't have skill names
-          icon: skill.icon_url
-        }))
-      });
-    }
-
-    // Add Frontend category if there are skills
-    if (frontendSkills.length > 0) {
-      organizedSkills.push({
-        category: "Frontend",
-        icon: <FaCode className="text-green-600 dark:text-green-400" />,
-        items: frontendSkills.map((skill, index) => ({
-          name: `Frontend ${index + 1}`, // Generic name since we don't have skill names
-          icon: skill.icon_url
-        }))
-      });
-    }
-
-    // Add Backend category if there are skills
-    if (backendSkills.length > 0) {
-      organizedSkills.push({
-        category: "Backend",
-        icon: <FaDatabase className="text-purple-600 dark:text-purple-400" />,
-        items: backendSkills.map((skill, index) => ({
-          name: `Backend ${index + 1}`, // Generic name since we don't have skill names
-          icon: skill.icon_url
-        }))
-      });
-    }
-
-    // Add Framework category if there are skills
-    if (frameworkSkills.length > 0) {
-      organizedSkills.push({
-        category: "Frameworks",
-        icon: <FaTools className="text-orange-600 dark:text-orange-400" />,
-        items: frameworkSkills.map((skill, index) => ({
-          name: `Framework ${index + 1}`, // Generic name since we don't have skill names
-          icon: skill.icon_url
-        }))
-      });
-    }
-
-    setSkillsData(organizedSkills);
-  };
-
-  useEffect(() => {
-    organizeSkillsData();
-  }, []);
+  fetchData();
+}, []);
 
   // Animations
   const containerVariants = {
