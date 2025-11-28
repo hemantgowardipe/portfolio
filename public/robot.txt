@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://portfolio-hemants-projects-d358e985.vercel.app/sitemap.xml
