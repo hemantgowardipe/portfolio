@@ -15,7 +15,7 @@
     "@vercel/analytics": "^1.5.0",
     "@vercel/speed-insights": "^1.2.0",
     "framer-motion": "^12.6.3",
-    "gsap": "^3.13.0",
+    "gsap": "^3.14.2",
     "lucide-react": "^0.539.0",
     "react": "^18.3.1",
     "react-creative-cursor": "^1.2.7",
