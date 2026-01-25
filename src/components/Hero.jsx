@@ -7,21 +7,21 @@ const Hero = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [photos, setPhotos] = useState([]);
 
-useEffect(() => {
-  const fetchPhotos = async () => {
-    try {
-      const response = await fetch(
-        "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=profile"
-      );
-      const data = await response.json();
-      setPhotos(data);
-    } catch (error) {
-      console.error("Error fetching profile photo:", error);
-    }
-  };
+  useEffect(() => {
+    const fetchPhotos = async () => {
+      try {
+        const response = await fetch(
+          "https://gxfrqjyvvjpmgbzodowu.supabase.co/functions/v1/hyper-responder?type=profile"
+        );
+        const data = await response.json();
+        setPhotos(data);
+      } catch (error) {
+        console.error("Error fetching profile photo:", error);
+      }
+    };
 
-  fetchPhotos();
-}, []);
+    fetchPhotos();
+  }, []);
 
 
   useEffect(() => {
@@ -45,8 +45,8 @@ useEffect(() => {
 
   // Individual item animation variants
   const itemVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: 100,
       scale: 0.8
     },
@@ -86,12 +86,12 @@ useEffect(() => {
       {/* Background Elements */}
       <div className="absolute inset-0">
         {/* Large decorative background text */}
-        <motion.div 
+        <motion.div
           className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
           initial={{ opacity: 0, scale: 1.2, rotate: -5 }}
           animate={{ opacity: 0.03, scale: 1, rotate: -2 }}
-          transition={{ 
-            duration: 2, 
+          transition={{
+            duration: 2,
             ease: [0.25, 0.1, 0.25, 1],
             delay: 1
           }}
@@ -100,7 +100,7 @@ useEffect(() => {
             HG
           </div>
         </motion.div>
-        
+
         {/* Subtle gradient overlays */}
         <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-gradient-radial from-gray-50/40 via-transparent to-transparent" />
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-gradient-radial from-gray-50/30 via-transparent to-transparent" />
@@ -132,9 +132,9 @@ useEffect(() => {
             variants={itemVariants}
           >
             <div className="relative w-40 h-24 mx-auto mb-4">
-              <motion.div 
+              <motion.div
                 className="w-full h-full rounded-2xl overflow-hidden shadow-lg"
-                whileHover={{ 
+                whileHover={{
                   scale: 1.05,
                   rotate: 2,
                   boxShadow: "0 20px 50px rgba(0,0,0,0.1)"
@@ -143,7 +143,7 @@ useEffect(() => {
               >
                 {photos.length > 0 ? (
                   photos.map((photo, index) => (
-                    <motion.img 
+                    <motion.img
                       key={index}
                       src={photo.image_url}
                       alt="Hemant Gowardipe"
@@ -166,11 +166,11 @@ useEffect(() => {
             variants={itemVariants}
           >
             <div className="overflow-hidden">
-              <motion.h1 
+              <motion.h1
                 className="text-8xl md:text-9xl lg:text-[12rem] font-black text-black tracking-tighter leading-none"
                 initial={{ y: 200 }}
                 animate={{ y: 0 }}
-                transition={{ 
+                transition={{
                   type: "spring",
                   stiffness: 100,
                   damping: 20,
@@ -208,7 +208,7 @@ useEffect(() => {
             variants={itemVariants}
           >
             <div className="overflow-hidden">
-              <motion.h2 
+              <motion.h2
                 className="text-4xl md:text-5xl lg:text-6xl font-black text-black tracking-tight leading-tight"
                 initial={{ y: 100 }}
                 animate={{ y: 0 }}
@@ -236,11 +236,11 @@ useEffect(() => {
               delay: 2
             }}
           >
-            <motion.div 
+            <motion.div
               className="text-7xl font-black text-gray-300"
               animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ 
-                duration: 4, 
+              transition={{
+                duration: 4,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
@@ -254,7 +254,7 @@ useEffect(() => {
             className="mb-16"
             variants={itemVariants}
           >
-            <motion.p 
+            <motion.p
               className="text-xl md:text-2xl font-semibold text-black max-w-4xl mx-auto mb-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -262,14 +262,14 @@ useEffect(() => {
             >
               I'm your Full Stack Developer
             </motion.p>
-            <motion.p 
+            <motion.p
               className="text-base md:text-lg text-gray-600 max-w-4xl mx-auto leading-relaxed"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2.4, duration: 0.8 }}
             >
-              From designing beautiful interfaces to making sure everything runs smoothly behind the scenes, 
-              I've got you covered. Let's turn your ideas into interactive wonders that make waves online. 
+              From designing beautiful interfaces to making sure everything runs smoothly behind the scenes,
+              I've got you covered. Let's turn your ideas into interactive wonders that make waves online.
               With me by your side, your website will be more than just pixels
             </motion.p>
           </motion.div>
